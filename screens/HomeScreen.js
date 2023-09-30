@@ -1,31 +1,55 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Image, StyleSheet, View, Text, TouchableWithoutFeedback } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  StatusBar,
+} from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useFonts, Sora_400Regular, Sora_700Bold, Sora_600SemiBold } from "@expo-google-fonts/sora";
+import { globalStyles } from "../components/styles/globalStyles";
 
-export default function HomeScreen() {
-  const sendIcon = 'https://img.icons8.com/ios-glyphs/BABABA/30/sent.png';
+
+export default function HomeScreen({ navigation }) {
+  const [fontsLoaded, fontError] = useFonts({ Sora_400Regular, Sora_600SemiBold, Sora_700Bold });
+  
+  if (!fontsLoaded && !fontError) {
+    console.log("Not loaded");
+    return null;
+  }
+
+  const sendIcon = "https://img.icons8.com/ios-glyphs/2F2D2C/30/sent.png";
+  const sendPrompt = async () => {
+    console.log("sending...");
+    navigation.navigate("Results");
+    console.log("sent");
+  };
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
-        <StatusBar />
-        <View style={styles.homeTextContainer}>
-          <Text style={styles.homeText}>
-            Share your thoughts, goals, or concerns, and let's start this
-            journey together
-          </Text>
-        </View>
-        <View style={styles.inputContainer}>
-            <View style={styles.inputField}>
-              <TextInput style={styles.input} placeholder="How can we assist you today?" />
-              <TouchableWithoutFeedback onPress={() => alert('Pressed')} style={styles.iconContainer}>
-                <Image source={{uri: sendIcon}} style={styles.icon} />
-              </TouchableWithoutFeedback>
-            </View>
-          </View>
+    <View style={styles.container}>
+      <StatusBar />
+      <View style={styles.homeTextContainer}>
+        <Text style={styles.homeText}>
+          Share your thoughts, goals, or concerns, and let's start this journey
+          together
+        </Text>
       </View>
-    </SafeAreaView>
+      <View style={globalStyles.inputContainer}>
+        <View style={globalStyles.inputField}>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="How can we assist you today?"
+          />
+          <TouchableWithoutFeedback
+            onPress={sendPrompt}
+            style={globalStyles.iconContainer}
+          >
+            <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
+          </TouchableWithoutFeedback>
+        </View>
+      </View>
+    </View>
   );
 }
 
@@ -43,36 +67,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   homeText: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 40,
-    color: '#C67C4E',
-    fontWeight: '700',
-  },
-  inputContainer: {
-    marginTop: '30%',
-    width: '100%',
-  },
-  inputField: {
-    borderWidth: 1,
-    borderRadius: 14,
-    borderColor: '#BABABA',
-    height: 56,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  input: {
-    color: '#BABABA',
-  },
-  iconContainer: {
-    width: 24,
-    height: 24,
-  },
-  icon: {
-    width: 24,
-    height: 24,
-    borderWidth: 1,
+    color: "#C67C4E",
+    fontFamily: 'Sora_600SemiBold',
   },
 });

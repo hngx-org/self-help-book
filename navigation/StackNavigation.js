@@ -3,6 +3,7 @@ import LoginScreen from '../screens/LoginScreen';
 import SignupScreen from '../screens/SignupScreen';
 import HomeScreen from '../screens/HomeScreen';
 import OnboardingScreen from "../screens/OnboardingScreen";
+import ResultScreen from "../screens/ResultScreen";
 import { TabNavigation } from "./TabNavigation";
 
 const Stack = createStackNavigator();
@@ -15,6 +16,7 @@ export function StackNavigation() {
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
+      <Stack.Screen name="Results" component={ResultScreen} />
     </Stack.Navigator>
   )
 }
