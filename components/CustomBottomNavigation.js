@@ -3,10 +3,26 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 
 const CustomBottomNavigation = ({ state, descriptors, navigation }) => {
   // Icons
-  const history = 'https://img.icons8.com/ios-filled/C67C4E/50/activity-history.png';
-  const profile = 'https://img.icons8.com/ios-filled/C67C4E/50/gender-neutral-user.png';
-  const home = "https://img.icons8.com/fluency-systems-filled/C67C4E/48/home.png";
+  const historyActive =
+    "https://img.icons8.com/ios-filled/C67C4E/50/activity-history.png";
+  const profileActive =
+    "https://img.icons8.com/ios-filled/C67C4E/50/gender-neutral-user.png";
+  const homeActive =
+    "https://img.icons8.com/fluency-systems-filled/C67C4E/48/home.png";
+  const homeInactive =
+    "https://img.icons8.com/fluency-systems-filled/2F2D2C/48/home.png";
+  const historyInactive =
+    "https://img.icons8.com/ios-filled/2F2D2C/50/activity-history.png";
+  const profileInactive =
+    "https://img.icons8.com/ios-filled/2F2D2C/50/gender-neutral-user.png";
 
+  const iconState = (focused, active, inactive) => {
+    if (focused) {
+      return <Image source={{ uri: active }} style={styles.icon} />;
+    } else {
+      return <Image source={{ uri: inactive }} style={styles.icon} />;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -50,7 +66,13 @@ const CustomBottomNavigation = ({ state, descriptors, navigation }) => {
             style={styles.navTextContainer}
             key={index}
           >
-            <Image source={{uri: route.name === "Home" ? home : route.name === "Profile" ? profile : history}} style={styles.icon} />
+            {route.name === "Home" &&
+              iconState(isFocused, homeActive, homeInactive)}
+            {route.name === "History" &&
+              iconState(isFocused, historyActive, historyInactive)}
+            {route.name === "Profile" &&
+              iconState(isFocused, profileActive, profileInactive)}
+            
             <Text
               style={[
                 styles.navText,
@@ -68,7 +90,14 @@ const CustomBottomNavigation = ({ state, descriptors, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
+    // position: 'absolute',
+    // zIndex: 1,
+    // bottom: 0,
+    // left: 0,
+    // backgroundColor: 'white',
     elevation: 1,
+    shadowColor: '#bababa',
+    shadowOffset: 2,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     width: "100%",
@@ -89,7 +118,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   navText: {
-    fontSize: 16,
+    fontSize: 12,
   },
 });
 
