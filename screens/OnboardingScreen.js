@@ -7,7 +7,7 @@ const OnboardingScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Text>OnboardingScreen is not showing</Text>
-      <Text onPress={() => navigation.navigate('Main')}>OnboardingScreen is not showing</Text>
+      <Text onPress={() => navigation.navigate('Signup')}>OnboardingScreen is not showing</Text>
     </View>
   )
 }
