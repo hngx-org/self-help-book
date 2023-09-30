@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     width: 24,
-    borderWidth: 1,
+    // borderWidth: 1,
     height: 24,
   },
   navText: {
