@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
+import { useFonts, Sora_400Regular } from "@expo-google-fonts/sora";
 
 const CustomBottomNavigation = ({ state, descriptors, navigation }) => {
+  const [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
   // Icons
   const historyActive =
     "https://img.icons8.com/ios-filled/C67C4E/50/activity-history.png";
@@ -95,6 +97,7 @@ const styles = StyleSheet.create({
     // bottom: 0,
     // left: 0,
     // backgroundColor: 'white',
+    // // paddingBottom: 30,
     elevation: 1,
     shadowColor: '#bababa',
     shadowOffset: 2,
@@ -119,6 +122,7 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: 12,
+    fontFamily: 'Sora_400Regular',
   },
 });
 

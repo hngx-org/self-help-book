@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+// import { StatusBar } from "expo-status-bar";
+import { View, SafeAreaView, StatusBar } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer } from "@react-navigation/native";
 import { StackNavigation } from "./navigation/StackNavigation";
+import { useFonts, Sora } from '@expo-google-fonts/sora';
+
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  let [fontsLoaded, fontError] = useFonts({ Sora });
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
@@ -17,6 +20,9 @@ export default function App() {
         // Artificially delay for two seconds to simulate a slow loading
         // experience. Please remove this if you copy and paste the code!
         await new Promise((resolve) => setTimeout(resolve, 2000));
+        if (!fontsLoaded && !fontError) {
+          return null;
+        }
       } catch (e) {
         console.warn(e);
       } finally {
@@ -46,7 +52,7 @@ export default function App() {
   }
 
   return (
-    <View style={{flex:1}} onLayout={onLayoutRootView}>
+    <View style={{flex:1, fontFamily: Sora}} onLayout={onLayoutRootView}>
       <StatusBar style="auto" />
       <NavigationContainer>
         <StackNavigation />

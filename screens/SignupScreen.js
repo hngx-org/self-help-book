@@ -1,11 +1,17 @@
+import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
 import React from 'react';
 import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 
 export default function SignupScreen({navigation}) {
-
+  let [fontsLoaded, fontError] = useFonts({Sora_400Regular})
   const handleSignUp = () => {
     //signup functions 
     navigation.navigate('Main')
+  }
+
+  if (!fontsLoaded && !fontError) {
+    console.log("Not loaded")
+    return null;
   }
 
   return (
@@ -14,14 +20,15 @@ export default function SignupScreen({navigation}) {
       <Text style={styles.mainText}>Sign Up</Text>
       <View style={styles.container}>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder={'Email'} />
-          <TextInput style={styles.input} placeholder={'Email'} />
-          <TextInput style={styles.input} placeholder={'Email'} />
+          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Email'} />
+          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Name'} />
+          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Password'} />
+          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Confirm password'} />
         </View>
         <View style={styles.loginContainer}>
-          <Text style={styles.text1}>already have an account? </Text>
+          <Text style={styles.text1}>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.text2}>login</Text>
+            <Text style={styles.text2}>Login</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity style={styles.button} onPress={handleSignUp} >
@@ -44,34 +51,39 @@ const styles = StyleSheet.create({
   },
   mainText: {
     color: "#C67C4E",
+    fontFamily: 'Sora_400Regular',
     fontSize: 34,
     fontWeight: '600'
   },
   inputContainer: {
     width: "100%",
     alignItems: "center",
-    marginTop: 15
+    marginTop: 15,
   },
   input: {
+    fontFamily: 'Sora_400Regular',
+    color: "#2F2D2C",
     width: "100%",
     height: 56,
     borderWidth: 2,
     borderColor: "#EAEAEA",
     borderRadius: 14,
-    padding: 10,
+    paddingHorizontal: 20,
     fontWeight: "600",
-    marginTop: 30
+    marginTop: 30,
   },
   loginContainer: {
     marginTop: 10,
     flexDirection: "row"
   },
   text1: {
-    fontSize: 12,
-    color: '#9B9B9B'
+    fontSize: 13,
+    color: '#9B9B9B',
+    fontFamily: 'Sora_400Regular',
   },
   text2: {
-    fontSize: 12,
+    fontFamily: 'Sora_400Regular',
+    fontSize: 13,
     color: "#C67C4E",
     fontWeight: '700'
   },
@@ -86,6 +98,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
+    fontFamily: 'Sora_400Regular',
     fontWeight: '600',
     color: '#fff'
   }
