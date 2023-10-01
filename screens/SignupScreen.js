@@ -6,7 +6,7 @@ export default function SignupScreen({navigation}) {
   let [fontsLoaded, fontError] = useFonts({Sora_400Regular})
   const handleSignUp = () => {
     //signup functions 
-    navigation.navigate('Main')
+    navigation.navigate('Subscription')
   }
 
   if (!fontsLoaded && !fontError) {
