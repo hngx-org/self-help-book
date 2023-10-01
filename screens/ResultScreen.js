@@ -6,6 +6,7 @@ import ResultCard from "../components/SelfHelpResultCard";
 import { globalStyles } from "../components/styles/globalStyles";
 
 const ResultScreen = ({result}) => {
+  console.log(result);
   const sendIcon = "https://img.icons8.com/ios-glyphs/2F2D2C/30/sent.png";
   const data = [
     {
@@ -69,7 +70,7 @@ const ResultScreen = ({result}) => {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <CustomHeader title="Result" />
+      <CustomHeader title="Result" showIcon={false} />
 
       <View style={styles.resultContainer}>
         <FlatList
