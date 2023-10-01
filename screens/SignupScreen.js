@@ -5,7 +5,7 @@ export default function SignupScreen({navigation}) {
 
   const handleSignUp = () => {
     //signup functions 
-    navigation.navigate('Main')
+    navigation.navigate('Subscription')
   }
 
   return (
