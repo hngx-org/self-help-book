@@ -10,7 +10,7 @@ export default function SignupScreen({navigation}) {
   }
 
   if (!fontsLoaded && !fontError) {
-    console.log("Not loaded")
+    // console.log("Not loaded")
     return null;
   }
 
