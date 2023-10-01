@@ -4,14 +4,14 @@ import { View, SafeAreaView, StatusBar } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { NavigationContainer } from "@react-navigation/native";
 import { StackNavigation } from "./navigation/StackNavigation";
-import { useFonts, Sora } from '@expo-google-fonts/sora';
+import { useFonts, Sora_300Light, Sora_700Bold, } from '@expo-google-fonts/sora';
 
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  let [fontsLoaded, fontError] = useFonts({ Sora });
+  let [fontsLoaded, fontError] = useFonts({ Sora_300Light, Sora_700Bold });
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function App() {
   }
 
   return (
-    <View style={{flex:1, fontFamily: Sora}} onLayout={onLayoutRootView}>
+    <View style={{flex:1, fontFamily: 'Sora_400Regular'}} onLayout={onLayoutRootView}>
       <StatusBar style="auto" />
       <NavigationContainer>
         <StackNavigation />

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts, Sora_600SemiBold } from "@expo-google-fonts/sora";
 
-const CustomHeader = ({title}) => {
+const CustomHeader = ({title, showIcon=true}) => {
   const [fontsLoaded, fontError] = useFonts({ Sora_600SemiBold });
   const navigation = useNavigation();
   const arrowIcon = "https://img.icons8.com/ios-filled/50/back.png";
@@ -14,7 +14,7 @@ const CustomHeader = ({title}) => {
         style={styles.iconContainer}
         onPress={() => navigation.goBack()}
       >
-        <Image source={{uri: arrowIcon}} style={styles.icon} />
+        {showIcon && <Image source={{uri: arrowIcon}} style={styles.icon} />}
       </TouchableOpacity>
       
       <Text style={styles.title}>{title}</Text>
