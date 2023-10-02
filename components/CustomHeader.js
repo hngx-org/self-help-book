@@ -3,13 +3,14 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts, Sora_600SemiBold } from "@expo-google-fonts/sora";
 
-const CustomHeader = ({title, showIcon=true}) => {
+const CustomHeader = ({title, showIcon=true, theme='light'}) => {
   const [fontsLoaded, fontError] = useFonts({ Sora_600SemiBold });
+
   const navigation = useNavigation();
   const arrowIcon = "https://img.icons8.com/ios-filled/50/back.png";
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: `${theme === 'light' ? '#f7f7f7' : '#c67c4e'}`}]}>
       <TouchableOpacity
         style={styles.iconContainer}
         onPress={() => navigation.goBack()}
@@ -17,7 +18,7 @@ const CustomHeader = ({title, showIcon=true}) => {
         {showIcon && <Image source={{uri: arrowIcon}} style={styles.icon} />}
       </TouchableOpacity>
       
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, {color: `${theme === 'light' ? '#c67c4e' : '#f7f7f7'}`}]}>{title}</Text>
     </View>
   )
 }
@@ -30,7 +31,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#F5F5F5",
   },
   iconContainer: {
     width: 20,
@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
     width: "100%",
     fontSize: 18,
     fontWeight: "600",
-    color: '#C67C4E',
     fontFamily: 'Sora_600SemiBold',
   }
 });

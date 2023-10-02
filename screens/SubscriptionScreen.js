@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { Image, Pressable, StyleSheet } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { View, SafeAreaView, Text } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Image, Pressable, StyleSheet, TouchableOpacity, View, SafeAreaView, Text } from "react-native";
 import CustomHeader from "../components/CustomHeader";
 import {useFonts, Sora_400Regular, Sora_600SemiBold} from '@expo-google-fonts/sora'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SubscriptionScreen = ({ navigation }) => {
   const [fontsLoaded, fontError] = useFonts({Sora_400Regular, Sora_600SemiBold});
+  const [user, setUser] = useState(null);
   const checkIcon = "https://img.icons8.com/ios-filled/ffffff/50/ok--v1.png";
   const [plan, setPlan] = useState(null);
   const handleContinue = () => {
@@ -15,6 +15,16 @@ const SubscriptionScreen = ({ navigation }) => {
       navigation.navigate("Main");
     }
   };
+
+  
+  useEffect(() => {
+    const getUser = async() => {
+      const user = await AsyncStorage.getItem('user');
+      setUser(JSON.parse(user));
+      console.log(JSON.parse(user));
+    }
+    getUser();
+  }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -93,7 +103,7 @@ const SubscriptionScreen = ({ navigation }) => {
                 }}
               >
                 <Text style={{ padding: 20, color: "#C67C4E", fontFamily: 'Sora_400Regular' }}>
-                  3 Free Trials Left
+                  {user ? user.credits : 3} Free Trials Left
                 </Text>
               </View>
             </Pressable>
