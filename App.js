@@ -53,7 +53,7 @@ export default function App() {
 
   return (
     <View style={{flex:1, fontFamily: 'Sora_400Regular'}} onLayout={onLayoutRootView}>
-      <StatusBar style="auto" />
+      <StatusBar />
       <NavigationContainer>
         <StackNavigation />
       </NavigationContainer>
