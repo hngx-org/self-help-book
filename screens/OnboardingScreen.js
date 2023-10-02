@@ -1,9 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { ImageBackground } from "react-native";
 import { useFonts, Sora_400Regular } from "@expo-google-fonts/sora";
 
 const OnboardingScreen = ({ navigation }) => {
+  const {height} = Dimensions.get('window');
   const [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
   if (!fontsLoaded && !fontError) {
     return null;
@@ -21,7 +22,7 @@ const OnboardingScreen = ({ navigation }) => {
         <Text
           style={{
             color: "white",
-            fontSize: 50,
+            fontSize: height * 0.05,
             textAlign: "center",
             marginBottom: 20,
             fontFamily: 'Sora_400Regular',

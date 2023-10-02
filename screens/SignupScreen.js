@@ -2,6 +2,7 @@ import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
 import React, { useState } from 'react';
 import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
+import { supabase } from '../utils/supabase';
 
 export default function SignupScreen({ navigation }) {
   let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
@@ -28,6 +29,11 @@ export default function SignupScreen({ navigation }) {
       if (response.status === 201) {
         // Registration successful
         console.log('Registration successful', response.data);
+        // Save user to Supabase
+        const { data, error } = await supabase
+          .from("users")
+          .insert([{ id: response.data.id, name, email, password }])
+          .select();
         navigation.navigate('Subscription');
       } else {
         console.error('Registration failed');
