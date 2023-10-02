@@ -173,7 +173,7 @@ const SubscriptionScreen = ({ navigation }) => {
           </View>
           
           {/* Subsscription button */}
-          <View style={[styles.button, {backgroundColor: `${plan ? '#C67C4E':'#E2BDA6'}`}]}>
+          <View style={[styles.button, {backgroundColor: `${plan ? '#C67C4E':'#E2BDA6'}`, justifyContent:'center', alignItems:'center'}]}>
             {plan ? (
               <TouchableOpacity onPress={handleContinue} >
                 <Text style={styles.buttonText}>Continue</Text>

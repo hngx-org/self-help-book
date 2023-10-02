@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FlatList, SafeAreaView, View } from "react-native";
 import { Text } from "react-native";
 
 const HistoryScreen = () =>{
 
     const [data, setData] = useState(['My name', 'Tunde'])
+
+    useEffect(()=>{
+        const getUser = async() =>{
+          try {
+            const res = await fetch('https://spitfire-interractions.onrender.com/api/auth/@me');
+            const response = await res.json()
+        
+            // Add this line to inspect the response
+            console.log('Response:', response);
+        
+            // setLoading(false);
+          } catch (error) {
+            console.error('Error logging out', error);
+          }
+        }
+        getUser()
+      },[])
     return(
         <SafeAreaView style={{flex: 1}}>
             <View style={{position:'absolute', padding: 20,left: 150}}>
