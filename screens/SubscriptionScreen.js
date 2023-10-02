@@ -173,15 +173,31 @@ const SubscriptionScreen = ({ navigation }) => {
           </View>
           
           {/* Subsscription button */}
-          <View style={[styles.button, {backgroundColor: `${plan ? '#C67C4E':'#E2BDA6'}`}]}>
-            {plan ? (
+            {/* {plan ? (
               <TouchableOpacity onPress={handleContinue} >
                 <Text style={styles.buttonText}>Continue</Text>
               </TouchableOpacity>
             ) : (
+              <View style={[styles.button, {backgroundColor: `${plan ? '#C67C4E':'#E2BDA6'}`, justifyContent:'center', alignItems:'center'}]}>
               <Text style={styles.buttonText}>Continue</Text>
-            )}
-          </View>
+              </View>
+            )} */}
+            {plan?
+            <TouchableOpacity style={styles.button} onPress={handleContinue}>
+            <Text style={styles.buttonText}>Continue</Text>
+        </TouchableOpacity>
+        :
+        <View style={{backgroundColor: '#E2BDA6', 
+        justifyContent:'center', 
+        alignItems:'center', 
+        width: "100%",
+        height: 62,
+        borderRadius: 16,        
+        marginTop: 30,
+        marginBottom: 20,}}>
+              <Text style={styles.buttonText}>Continue</Text>
+              </View>
+        }
         </View>
       </View>
     </SafeAreaView>
@@ -193,20 +209,18 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 62,
     borderRadius: 16,
+    backgroundColor: "#C67C4E",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 30,
     marginBottom: 20,
   },
   buttonText: {
-    textAlignVertical: 'center',
-    textAlign: 'center',
-    width: '100%',
-    height: '100%',
-    borderRadius: 16,
     fontSize: 16,
-    fontFamily: "Sora_400Regular",
-    fontWeight: "600",
-    color: "#fff",
-  },
+    fontFamily: 'Sora_400Regular',
+    fontWeight: '600',
+    color: '#fff'
+  }
 });
 
 export default SubscriptionScreen;
