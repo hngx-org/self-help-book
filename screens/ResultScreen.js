@@ -17,23 +17,26 @@ import { globalStyles } from "../components/styles/globalStyles";
 import { supabase } from "../utils/supabase";
 
 const ResultScreen = ({ route }) => {
+  // get the new chat id from the route params
+  const chatId = route.params.chatId;
   const [data, setData] = useState(route.params.result);
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(false);
-  console.log(data);
+
   const sendIcon = "https://img.icons8.com/ios-glyphs/2F2D2C/30/sent.png";
+  const baseUrl = 'https://spitfire-interractions.onrender.com/';
 
   // Function to create a new chat
   const addNewChat = async (newChat) => {
     const { data:chats } = await supabase
       .from('chats')
       .select('chat')
-      .eq('id', data.chatId);
-
+      .eq('id', chatId);
+    console.log(chats)
     const { error } = await supabase
       .from("chats")
       .update({ chat: [...chats[0].chat, newChat] })
-      .eq("id", data.chatId);
+      .eq("id", chatId);
   };
 
   const sendPrompt = async () => {
@@ -104,7 +107,7 @@ const ResultScreen = ({ route }) => {
             onPress={sendPrompt}
             style={globalStyles.iconContainer}
           >
-            {loading ? <ActivityIndicator /> : <Image source={{ uri: sendIcon }} style={globalStyles.icon} />}
+            {loading ? <ActivityIndicator size="small" color="#2F2D2C" /> : <Image source={{ uri: sendIcon }} style={globalStyles.icon} />}
           </TouchableOpacity>
         </View>
       </View>

@@ -87,7 +87,7 @@ export default function HomeScreen({ navigation }) {
         // Create a new chat and save to supabase;
         await createNewChat(chatId, selfHelp);
         // Navigate to the result screen and send the selfHelp variable
-        navigation.navigate("Results", { result: [{chatId, ...selfHelp}] });
+        navigation.navigate("Results", { result: [selfHelp], chatId });
         console.log("sent");
       } else {
         Alert.alert("Hello, the prompt is empty how can we be of help");
