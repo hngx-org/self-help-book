@@ -1,42 +1,90 @@
 import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
-import React from 'react';
-import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, } from 'react-native';
+import axios from 'axios';
 
-export default function SignupScreen({navigation}) {
-  let [fontsLoaded, fontError] = useFonts({Sora_400Regular})
-  const handleSignUp = () => {
-    //signup functions 
-    navigation.navigate('Subscription')
-  }
+export default function LoginScreen({ navigation }) {
+  let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        'https://spitfire-interractions.onrender.com/api/auth/login',
+        {
+          email,
+          password,
+        }
+      );
+
+      if (response.status === 200) {
+        // Login successful
+        console.log('Login successful', response.data);
+        navigation.navigate('Subscription');
+      } else {
+        console.error('Login failed');
+        Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error during login', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        Alert.alert('Login Failed', error.response.data.message);
+      } else {
+        Alert.alert('Login Error', 'An error occurred during login.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!fontsLoaded && !fontError) {
-    // console.log("Not loaded")
     return null;
   }
 
   return (
     <SafeAreaView style={styles.mainContainer}>
       <StatusBar />
-      <Text style={styles.mainText}>Login</Text>
-      <View style={styles.container}>
+      <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>Login</Text>
+      <View style={[styles.container, isLoading && styles.fadeContainer]}>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Email'} />
-          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Password'} />
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={'#bababa'}
+            placeholder={'Email'}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={'#bababa'}
+            placeholder={'Password'}
+            secureTextEntry={true}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+          />
         </View>
         <View style={styles.loginContainer}>
           <Text style={styles.text1}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
             <Text style={styles.text2}>Sign Up</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleSignUp} >
-          <Text style={styles.buttonText}>Login</Text>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Login</Text>
+          )}
         </TouchableOpacity>
-
       </View>
     </SafeAreaView>
-  )
+  );
 }
+
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -46,6 +94,9 @@ const styles = StyleSheet.create({
   },
   container: {
     width: '90%',
+  },
+  fadeContainer: {
+    opacity: 0.6,
   },
   mainText: {
     color: "#C67C4E",
