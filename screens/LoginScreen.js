@@ -1,9 +1,10 @@
 import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, } from 'react-native';
+import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, Dimensions } from 'react-native';
 import axios from 'axios';
 
 export default function LoginScreen({ navigation }) {
+  const { height } = Dimensions.get('window');
   let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
 
   const [email, setEmail] = useState('');
