@@ -1,14 +1,49 @@
 import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
-import React from 'react';
-import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import axios from 'axios';
 
-export default function SignupScreen({navigation}) {
-  let [fontsLoaded, fontError] = useFonts({Sora_400Regular})
-  const handleSignUp = () => {
-    //signup functions 
-    navigation.navigate('Subscription')
-  }
+export default function SignupScreen({ navigation }) {
+  let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
 
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Add isLoading state
+
+  const handleSignUp = async () => {
+    setIsLoading(true); // Set isLoading to true when signup starts
+    try {
+      const response = await axios.post(
+        'https://spitfire-interractions.onrender.com/api/auth/register',
+        {
+          name,
+          email,
+          password,
+          confirm_password: confirmPassword,
+        }
+      );
+
+      if (response.status === 201) {
+        // Registration successful
+        console.log('Registration successful', response.data);
+        navigation.navigate('Subscription');
+      } else {
+        console.error('Registration failed');
+        Alert.alert('Registration Failed', 'Please check your input and try again.');
+      }
+    } catch (error) {
+      console.error('Error during registration', error);
+      if (error.response && error.response.data && error.response.data.message) {
+        Alert.alert('Registration Failed', error.response.data.message);
+      } else {
+        Alert.alert('Registration Error', 'An error occurred during registration.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
   if (!fontsLoaded && !fontError) {
     // console.log("Not loaded")
     return null;
@@ -17,13 +52,39 @@ export default function SignupScreen({navigation}) {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <StatusBar />
-      <Text style={styles.mainText}>Sign Up</Text>
-      <View style={styles.container}>
+      <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>Sign Up</Text>
+      <View style={[styles.container, isLoading && styles.fadeContainer]}>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Email'} />
-          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Name'} />
-          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Password'} />
-          <TextInput style={styles.input} placeholderTextColor={'#bababa'} placeholder={'Confirm password'} />
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={'#bababa'}
+            placeholder={'Name'}
+            value={name}
+            onChangeText={(text) => setName(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={'#bababa'}
+            placeholder={'Email'}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={'#bababa'}
+            placeholder={'Password'}
+            secureTextEntry={true}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholderTextColor={'#bababa'}
+            placeholder={'Confirm password'}
+            secureTextEntry={true}
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
+          />
         </View>
         <View style={styles.loginContainer}>
           <Text style={styles.text1}>Already have an account? </Text>
@@ -31,13 +92,17 @@ export default function SignupScreen({navigation}) {
             <Text style={styles.text2}>Login</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleSignUp} >
-          <Text style={styles.buttonText}>Sign Up</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Sign Up</Text>
+          )}
         </TouchableOpacity>
 
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -48,6 +113,9 @@ const styles = StyleSheet.create({
   },
   container: {
     width: '90%',
+  },
+  fadeContainer: {
+    opacity: 0.6,
   },
   mainText: {
     color: "#C67C4E",
