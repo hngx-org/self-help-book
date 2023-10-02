@@ -2,6 +2,7 @@ import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
 import React, { useState } from 'react';
 import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, Dimensions } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation }) {
   const { height } = Dimensions.get('window');
@@ -21,10 +22,14 @@ export default function LoginScreen({ navigation }) {
           password,
         }
       );
+      console.log(response);
 
       if (response.status === 200) {
         // Login successful
         console.log('Login successful', response.data);
+        // Save user for easy retrieval
+        AsyncStorage.setItem('user', JSON.stringify(response.data.data));
+
         navigation.navigate('Subscription');
       } else {
         console.error('Login failed');
