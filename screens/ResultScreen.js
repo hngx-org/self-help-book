@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   StatusBar,
@@ -22,6 +22,7 @@ import selfHelpKeywords from "../utils/selfhelpkeywords";
 
 const ResultScreen = ({ route }) => {
   const chatId = route.params.chatId;
+  const [user, setUser] = useState(null);
   const [data, setData] = useState(route.params.result);
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -41,6 +42,13 @@ const ResultScreen = ({ route }) => {
       .eq("id", chatId);
   };
 
+  // Function to get details of sign in user
+  const getSignedInUser = async () => {
+    const req = await fetch(`${baseUrl}/api/auth/@me`);
+    const user = await req.json();
+    setUser({ ...user.data });
+  };
+
   const sendPrompt = async () => {
     console.log("sending...");
     setLoading(true);
@@ -51,6 +59,14 @@ const ResultScreen = ({ route }) => {
         const containsSelfHelpKeywords = selfHelpKeywords.some((keyword) =>
           prompt.toLowerCase().includes(keyword.toLowerCase())
         );
+        // Check if the user has any credits left
+        if (user.credits <= 0) {
+          Alert.alert(
+            "Sorry",
+            "You have no credits left, please buy more credits to continue using the app"
+          );
+          return;
+        }
 
         if (containsSelfHelpKeywords) {
           // Send prompt request to the chatgpt API using the backend API
@@ -76,7 +92,8 @@ const ResultScreen = ({ route }) => {
           console.log("sent");
         } else {
           // Display a response for non-self-help questions
-          const nonSelfHelpResponse = "We can only provide answer to self help related questions.";
+          const nonSelfHelpResponse =
+            "We can only provide answer to self help related questions.";
 
           Alert.alert("Sorry", nonSelfHelpResponse);
         }
@@ -91,47 +108,55 @@ const ResultScreen = ({ route }) => {
     }
   };
 
+  useEffect(() => {
+    getSignedInUser();
+  }, []);
+
   return (
     <KeyboardAvoidingView
-    style={{ flex: 1 }}
+      style={{ flex: 1 }}
       behavior="padding"
       enabled
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}>
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="auto" />
-      <CustomHeader title="Result" showIcon={false} />
+      keyboardVerticalOffset={Platform.OS === "ios" ? 5 : 0}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="auto" />
+        <CustomHeader title="Result" showIcon={false} />
 
-      <View style={styles.resultContainer}>
-        {data.length > 0 ? (
-          <FlatList
-            data={data}
-            showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => data.indexOf(item).toString()}
-            renderItem={({ item }) => <ResultCard result={item} />}
-          />
-        ) : (
-          <Text>No results found</Text>
-        )}
-      </View>
-
-      <View style={[globalStyles.inputContainer, styles.inputContainer]}>
-        <View style={globalStyles.inputField}>
-          <TextInput
-            style={globalStyles.input}
-            placeholder="How can we assist you today?"
-            value={prompt}
-            onChangeText={(text) => setPrompt(text)}
-          />
-          <TouchableOpacity onPress={sendPrompt} style={globalStyles.iconContainer}>
-            {loading ? (
-              <ActivityIndicator size="small" color="#2F2D2C" />
-            ) : (
-              <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
-            )}
-          </TouchableOpacity>
+        <View style={styles.resultContainer}>
+          {data.length > 0 ? (
+            <FlatList
+              data={data}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item) => data.indexOf(item).toString()}
+              renderItem={({ item }) => <ResultCard result={item} />}
+            />
+          ) : (
+            <Text>No results found</Text>
+          )}
         </View>
-      </View>
-    </SafeAreaView>
+
+        <View style={[globalStyles.inputContainer, styles.inputContainer]}>
+          <View style={globalStyles.inputField}>
+            <TextInput
+              style={globalStyles.input}
+              placeholder="How can we assist you today?"
+              value={prompt}
+              onChangeText={(text) => setPrompt(text)}
+            />
+            <TouchableOpacity
+              onPress={sendPrompt}
+              style={globalStyles.iconContainer}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#2F2D2C" />
+              ) : (
+                <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };

@@ -25,6 +25,7 @@ import selfHelpKeywords from "../utils/selfhelpkeywords";
 import { useEffect } from "react";
 import { KeyboardAvoidingView } from "react-native";
 import { SafeAreaView } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen({ navigation }) {
   // Get the height and width of the mobile device
@@ -59,7 +60,7 @@ export default function HomeScreen({ navigation }) {
   const getSignedInUser = async () => {
     const req = await fetch(`${baseUrl}/api/auth/@me`);
     const user = await req.json();
-    setUser({ name: user.data.name, id: user.data.id, email: user.data.email });
+    setUser({ ...user.data });
   };
 
   const sendPrompt = async () => {
@@ -73,6 +74,12 @@ export default function HomeScreen({ navigation }) {
         const containsSelfHelpKeywords = selfHelpKeywords.some(keyword =>
           prompt.toLowerCase().includes(keyword.toLowerCase())
         );
+
+        // Check if the user has any credits left
+        if(user.credits <= 0) {
+          Alert.alert("Sorry", "You have no credits left, please buy more credits to continue using the app");
+          return;
+        }
 
         if (containsSelfHelpKeywords) {
           // Send prompt request to the chatgpt API using the backend API
