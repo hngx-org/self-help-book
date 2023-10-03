@@ -9,6 +9,7 @@ const SubscriptionScreen = ({ navigation }) => {
   const [user, setUser] = useState(null);
   const checkIcon = "https://img.icons8.com/ios-filled/ffffff/50/ok--v1.png";
   const [plan, setPlan] = useState(null);
+
   const handleContinue = () => {
     //signup functions
     if (plan == "free") {
@@ -22,6 +23,10 @@ const SubscriptionScreen = ({ navigation }) => {
       const user = await AsyncStorage.getItem('user');
       setUser(JSON.parse(user));
       console.log(JSON.parse(user));
+
+      if (!fontsLoaded && !fontError) {
+        return null;
+      }
     }
     getUser();
   }, []);
@@ -71,7 +76,7 @@ const SubscriptionScreen = ({ navigation }) => {
                       fontSize: 25,
                       fontWeight: 600,
                       marginBottom: 15,
-                      fontFamily: "Sora_600SemiBold",
+                      fontFamily: 'Sora_600SemiBold',
                     }}
                   >
                     Free plan
@@ -194,7 +199,7 @@ const SubscriptionScreen = ({ navigation }) => {
             )} */}
             {plan?
             <TouchableOpacity style={styles.button} onPress={handleContinue}>
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={[styles.buttonText, {fontFamily: 'Sora_400Regular'}]}>Continue</Text>
         </TouchableOpacity>
         :
         <View style={{backgroundColor: '#E2BDA6', 
@@ -205,7 +210,7 @@ const SubscriptionScreen = ({ navigation }) => {
         borderRadius: 16,        
         marginTop: 30,
         marginBottom: 20,}}>
-              <Text style={styles.buttonText}>Continue</Text>
+              <Text style={[styles.buttonText, {fontFamily: 'Sora_400Regular'}]}>Continue</Text>
               </View>
         }
         </View>
@@ -227,7 +232,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontFamily: 'Sora_400Regular',
     fontWeight: '600',
     color: '#fff'
   }

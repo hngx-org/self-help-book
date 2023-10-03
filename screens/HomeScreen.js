@@ -169,10 +169,6 @@ const styles = StyleSheet.create({
     rowGap: 50,
     justifyContent: "flex-end",
     paddingHorizontal: 30,
-    // paddingBottom: 80,
-  },
-  homeTextContainer: {
-    paddingHorizontal: 20,
   },
   homeText: {
     textAlign: "center",

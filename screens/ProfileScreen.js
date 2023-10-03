@@ -56,12 +56,12 @@ const ProfileScreen = ({ navigation }) => {
           source={require("../assets/profile.png")}
         />
         <View style={{ flexDirection: "row", marginBottom: 10 }}>
-          <Text style={{ fontSize: 27, color: "white" }}>Hello, </Text>
-          <Text style={{ fontSize: 27, color: "white", fontWeight: 600 }}>
+          <Text style={{ fontSize: 28, color: "white", fontFamily: 'Sora_400Regular' }}>Hello, </Text>
+          <Text style={{ fontSize: 28, color: "white", fontFamily: 'Sora_600SemiBold', textTransform: 'capitalize' }}>
             {user.name}
           </Text>
         </View>
-        <Text style={{ color: "white" }}>{user.email}</Text>
+        <Text style={{ color: "white", fontFamily: 'Sora_400Regular' }}>{user.email}</Text>
         {loading ? (
           <TouchableOpacity
             style={{
@@ -75,7 +75,7 @@ const ProfileScreen = ({ navigation }) => {
               justifyContent: 'center',
             }}
           >
-            <ActivityIndicator size="small" color="black" />
+            <ActivityIndicator size="small" color="#C67C4E" />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -92,7 +92,7 @@ const ProfileScreen = ({ navigation }) => {
               columnGap: 10,
             }}
           >
-            <Text style={{ color: "#C67C4E"}}>Log Out</Text>
+            <Text style={{ color: "#C67C4E", fontFamily: 'Sora_400Regular'}}>Log Out</Text>
             <Image
               style={{ width: 22, height: 22 }}
               source={require("../assets/exit.png")}

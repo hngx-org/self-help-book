@@ -15,25 +15,29 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        'https://spitfire-interractions.onrender.com/api/auth/login',
-        {
-          email,
-          password,
+      if(email && password) {
+        const response = await axios.post(
+          'https://spitfire-interractions.onrender.com/api/auth/login',
+          {
+            email,
+            password,
+          }
+        );
+        console.log(response);
+
+        if (response.status === 200) {
+          // Login successful
+          console.log('Login successful', response.data);
+          // Save user for easy retrieval
+          AsyncStorage.setItem('user', JSON.stringify(response.data.data));
+
+          navigation.navigate('Subscription');
+        } else {
+          console.error('Login failed');
+          Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
         }
-      );
-      console.log(response);
-
-      if (response.status === 200) {
-        // Login successful
-        console.log('Login successful', response.data);
-        // Save user for easy retrieval
-        AsyncStorage.setItem('user', JSON.stringify(response.data.data));
-
-        navigation.navigate('Subscription');
       } else {
-        console.error('Login failed');
-        Alert.alert('Login Failed', 'Invalid email or password. Please try again.');
+        return new Error('Email or password cannot be empty');
       }
     } catch (error) {
       console.error('Error during login', error);
@@ -44,6 +48,8 @@ export default function LoginScreen({ navigation }) {
       }
     } finally {
       setIsLoading(false);
+      setEmail(null);
+      setPassword(null);
     }
   };
 

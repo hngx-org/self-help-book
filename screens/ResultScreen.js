@@ -76,15 +76,9 @@ const ResultScreen = ({ route }) => {
           console.log("sent");
         } else {
           // Display a response for non-self-help questions
-          const nonSelfHelpResponse =
-            "I can't provide answers to questions that are not related to self-help.";
-          const nonSelfHelp = {
-            question: prompt,
-            answer: nonSelfHelpResponse,
-          };
-          await addNewChat(nonSelfHelp);
-          setData([...data, nonSelfHelp]);
-          console.log("sent");
+          const nonSelfHelpResponse = "We can only provide answer to self help related questions.";
+
+          Alert.alert("Sorry", nonSelfHelpResponse);
         }
       } else {
         Alert.alert("Hello, the prompt is empty. How can we be of help?");
