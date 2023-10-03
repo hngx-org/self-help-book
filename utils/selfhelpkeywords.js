@@ -47,6 +47,7 @@ const selfHelpKeywords = [
     "emotional intelligence",
     "life balance",
     "wellness practices",
+    "lifestyle"
     // Add more keywords as needed
 ];
 
