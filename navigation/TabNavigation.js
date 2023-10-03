@@ -13,7 +13,7 @@ export function TabNavigation() {
       screenOptions={{ headerShown: false, tabBarHideOnKeyboard: true }}
       tabBar={(props) => <CustomBottomNavigation {...props} />}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} options={{tabBarHideOnKeyboard: true}} />
       <Tab.Screen name="History" component={HistoryScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

@@ -81,10 +81,10 @@ const HistoryScreen = ({ navigation }) => {
                   borderWidth: 1,
                   borderColor: "#2F2D2C",
                   textAlign: "center",
-                  height: height * 0.06,
+                  minHeight: height * 0.06,
                   borderRadius: 4,
                   padding: 10,
-                  marginVertical: 5,
+                  marginVertical: 7,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -95,6 +95,7 @@ const HistoryScreen = ({ navigation }) => {
                     color: "#2f2d2c",
                     fontSize: height * 0.02,
                     fontWeight: "500",
+                    fontFamily: 'Sora_400Regular',
                   }}
                 >
                   {item?.chat[0]?.question}

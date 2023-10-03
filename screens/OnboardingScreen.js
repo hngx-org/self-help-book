@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { ImageBackground } from "react-native";
-import { useFonts, Sora_400Regular } from "@expo-google-fonts/sora";
+import { useFonts } from "expo-font";
+import { Sora_400Regular } from "@expo-google-fonts/sora";
 
 const OnboardingScreen = ({ navigation }) => {
   const {height} = Dimensions.get('window');
@@ -10,9 +11,8 @@ const OnboardingScreen = ({ navigation }) => {
     return null;
   } else {
     console.log("Fonts loaded");
-    // console.log(Sora_400Regular)
   }
-  // console.log("Working");
+
   return (
     <ImageBackground
       source={require("../assets/Onboarding.png")}
@@ -20,13 +20,12 @@ const OnboardingScreen = ({ navigation }) => {
     >
       <View style={{ flex: 1, justifyContent: "flex-end", width: '100%', rowGap: 50, }}>
         <Text
-          style={{
+          style={[styles.soraRegular, {
             color: "white",
             fontSize: height * 0.05,
             textAlign: "center",
             marginBottom: 20,
-            fontFamily: 'Sora_400Regular',
-          }}
+          }]}
         >
           Guiding You Through Life's Challenges: Find Motivation and Thrive
         </Text>
@@ -41,7 +40,7 @@ const OnboardingScreen = ({ navigation }) => {
             borderRadius: 16,
           }}
         >
-          <Text style={{ color: "white", fontSize: 16, fontFamily: 'Sora_400Regular', }}>Get Started</Text>
+          <Text style={[styles.soraRegular, { color: "white", fontSize: 16 }]}>Get Started</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -56,6 +55,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 30,
   },
+  soraRegular: {
+    fontFamily: "Sora_400Regular",
+  }
 });
 
 export default OnboardingScreen;

@@ -92,12 +92,6 @@ const CustomBottomNavigation = ({ state, descriptors, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // position: 'absolute',
-    // zIndex: 1,
-    // bottom: 0,
-    // left: 0,
-    // backgroundColor: 'white',
-    // // paddingBottom: 30,
     elevation: 1,
     shadowColor: '#bababa',
     shadowOffset: 2,

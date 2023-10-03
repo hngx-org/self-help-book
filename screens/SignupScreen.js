@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { supabase } from '../utils/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignupScreen({ navigation }) {
   let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
@@ -29,6 +30,8 @@ export default function SignupScreen({ navigation }) {
       if (response.status === 201) {
         // Registration successful
         console.log('Registration successful', response.data);
+        // Save user to local storage
+        AsyncStorage.setItem('user', JSON.stringify(response.data.data));
         // Save user to Supabase
         const { data, error } = await supabase
           .from("users")
@@ -48,6 +51,9 @@ export default function SignupScreen({ navigation }) {
       }
     } finally {
       setIsLoading(false);
+      setName(null);
+      setEmail(null);
+      setPassword(null);
     }
   };
   if (!fontsLoaded && !fontError) {
