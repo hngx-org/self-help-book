@@ -72,6 +72,7 @@ const ProfileScreen = ({ navigation }) => {
               borderRadius: 5,
               marginVertical: 20,
               alignItems: "center",
+              justifyContent: 'center',
             }}
           >
             <ActivityIndicator size="small" color="black" />
