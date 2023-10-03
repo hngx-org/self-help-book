@@ -93,8 +93,7 @@ const HistoryScreen = ({ navigation }) => {
                 <Text
                   style={{
                     color: "#2f2d2c",
-                    fontSize: height * 0.02,
-                    fontWeight: "500",
+                    fontSize: height * 0.019,
                     fontFamily: 'Sora_400Regular',
                   }}
                 >
