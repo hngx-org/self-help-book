@@ -101,17 +101,10 @@ export default function HomeScreen({ navigation }) {
           console.log("sent");
         } else {
           // Display a response for non-self-help questions
-          const nonSelfHelpResponse = "I can't provide answers to questions that are not related to self-help.";
-          // Create a response variable called nonSelfHelp to hold the response
-          const nonSelfHelp = {
-            question: prompt,
-            answer: nonSelfHelpResponse,
-          };
-          // Create a new chat and save to supabase;
-          await createNewChat(chatId, nonSelfHelp);
-          // Navigate to the result screen and send the nonSelfHelp variable
-          navigation.navigate("Results", { result: [nonSelfHelp], chatId });
-          console.log("sent");
+          const nonSelfHelpResponse = "We can only provide answer to self help related questions.";
+
+          Alert.alert("Sorry", nonSelfHelpResponse);
+
         }
       } else {
         Alert.alert("Hello, the prompt is empty how can we be of help");
@@ -131,38 +124,38 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <KeyboardAvoidingView
-    style={{ flex: 1 }}
-    behavior="padding"
+      style={{ flex: 1 }}
+      behavior="padding"
       enabled
       keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}>
-        <SafeAreaView style={styles.container}>
-      <StatusBar />
-      <View style={styles.homeTextContainer}>
-        <Text style={[styles.homeText, { fontSize: height * 0.05 }]}>
-          Share your thoughts, goals, or concerns, and let's start this journey
-          together
-        </Text>
-      </View>
-      <View style={globalStyles.inputContainer}>
-        <View style={globalStyles.inputField}>
-          <TextInput
-            style={globalStyles.input}
-            value={prompt}
-            placeholder="How can we assist you today?"
-            onChangeText={(text) => setPrompt(text)}
-          />
-          <TouchableWithoutFeedback
-            onPress={sendPrompt}
-            style={globalStyles.iconContainer}
-          >
-            {loading ? (
-              <ActivityIndicator size="small" color="#2F2D2C" />
-            ) : (
-              <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
-            )}
-          </TouchableWithoutFeedback>
+      <SafeAreaView style={styles.container}>
+        <StatusBar />
+        <View style={styles.homeTextContainer}>
+          <Text style={[styles.homeText, { fontSize: height * 0.05 }]}>
+            Share your thoughts, goals, or concerns, and let's start this journey
+            together
+          </Text>
         </View>
-      </View>
+        <View style={globalStyles.inputContainer}>
+          <View style={globalStyles.inputField}>
+            <TextInput
+              style={globalStyles.input}
+              value={prompt}
+              placeholder="How can we assist you today?"
+              onChangeText={(text) => setPrompt(text)}
+            />
+            <TouchableWithoutFeedback
+              onPress={sendPrompt}
+              style={globalStyles.iconContainer}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color="#2F2D2C" />
+              ) : (
+                <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
+              )}
+            </TouchableWithoutFeedback>
+          </View>
+        </View>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

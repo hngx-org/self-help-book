@@ -19,6 +19,7 @@ export const globalStyles = StyleSheet.create({
   },
   input: {
     color: "#2F2D2C",
+    flex: 1
   },
   iconContainer: {
     width: 24,
