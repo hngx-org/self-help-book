@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import {
   View,
   StatusBar,
@@ -18,23 +18,23 @@ import { globalStyles } from "../components/styles/globalStyles";
 import { supabase } from "../utils/supabase";
 import { SafeAreaView } from "react-native";
 
+import selfHelpKeywords from "../utils/selfhelpkeywords";
+
 const ResultScreen = ({ route }) => {
-  // get the new chat id from the route params
   const chatId = route.params.chatId;
   const [data, setData] = useState(route.params.result);
   const [prompt, setPrompt] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const sendIcon = "https://img.icons8.com/ios-glyphs/2F2D2C/30/sent.png";
-  const baseUrl = 'https://spitfire-interractions.onrender.com/';
+  const baseUrl = "https://spitfire-interractions.onrender.com/";
 
-  // Function to create a new chat
   const addNewChat = async (newChat) => {
-    const { data:chats } = await supabase
-      .from('chats')
-      .select('chat')
-      .eq('id', chatId);
-    console.log(chats)
+    const { data: chats } = await supabase
+      .from("chats")
+      .select("chat")
+      .eq("id", chatId);
+    console.log(chats);
     const { error } = await supabase
       .from("chats")
       .update({ chat: [...chats[0].chat, newChat] })
@@ -47,30 +47,47 @@ const ResultScreen = ({ route }) => {
     try {
       // Check if prompt is empty or not
       if (prompt) {
-        // Send prompt request to the chatgpt API using the backend API
-        const req = await fetch(`${baseUrl}/api/chat/completions`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            history: data,
-            user_input: prompt,
-          }),
-        });
-        const response = await req.json();
-        // Create a response variable called selfHelp to hold both the question and the result
-        // This will be sent to the result screen
-        const selfHelp = {
-          question: prompt,
-          answer: response.message,
-        };
-        // Create a new chat and save to supabase;
-        await addNewChat(selfHelp);
-        setData([...data, selfHelp]);
-        console.log("sent");
+        // Check if the prompt contains keywords related to self-help
+        const containsSelfHelpKeywords = selfHelpKeywords.some((keyword) =>
+          prompt.toLowerCase().includes(keyword.toLowerCase())
+        );
+
+        if (containsSelfHelpKeywords) {
+          // Send prompt request to the chatgpt API using the backend API
+          const req = await fetch(`${baseUrl}/api/chat/completions`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              history: data,
+              user_input: prompt,
+            }),
+          });
+          const response = await req.json();
+          // Create a response variable called selfHelp to hold both the question and the result
+          const selfHelp = {
+            question: prompt,
+            answer: response.message,
+          };
+          // Create a new chat and save to supabase;
+          await addNewChat(selfHelp);
+          setData([...data, selfHelp]);
+          console.log("sent");
+        } else {
+          // Display a response for non-self-help questions
+          const nonSelfHelpResponse =
+            "I can't provide answers to questions that are not related to self-help.";
+          const nonSelfHelp = {
+            question: prompt,
+            answer: nonSelfHelpResponse,
+          };
+          await addNewChat(nonSelfHelp);
+          setData([...data, nonSelfHelp]);
+          console.log("sent");
+        }
       } else {
-        Alert.alert("Hello, the prompt is empty how can we be of help");
+        Alert.alert("Hello, the prompt is empty. How can we be of help?");
       }
     } catch (error) {
       console.log(error);
@@ -95,7 +112,7 @@ const ResultScreen = ({ route }) => {
           <FlatList
             data={data}
             showsVerticalScrollIndicator={false}
-            keyExtractor={(item) => data.indexOf(item)}
+            keyExtractor={(item) => data.indexOf(item).toString()}
             renderItem={({ item }) => <ResultCard result={item} />}
           />
         ) : (
@@ -111,11 +128,12 @@ const ResultScreen = ({ route }) => {
             value={prompt}
             onChangeText={(text) => setPrompt(text)}
           />
-          <TouchableOpacity
-            onPress={sendPrompt}
-            style={globalStyles.iconContainer}
-          >
-            {loading ? <ActivityIndicator size="small" color="#2F2D2C" /> : <Image source={{ uri: sendIcon }} style={globalStyles.icon} />}
+          <TouchableOpacity onPress={sendPrompt} style={globalStyles.iconContainer}>
+            {loading ? (
+              <ActivityIndicator size="small" color="#2F2D2C" />
+            ) : (
+              <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
+            )}
           </TouchableOpacity>
         </View>
       </View>
