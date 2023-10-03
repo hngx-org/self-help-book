@@ -40,7 +40,7 @@ const HistoryScreen = ({navigation}) => {
             .from("chats")
             .select("*")
             .eq("user_id", response?.data?.id);
-          // console.log(data?.length)
+          console.log(data?.length)
           setData(data);
         }
 

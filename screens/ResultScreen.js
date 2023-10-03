@@ -52,6 +52,7 @@ const ResultScreen = ({ route }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            history: data,
             user_input: prompt,
           }),
         });
