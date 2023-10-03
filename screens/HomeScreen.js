@@ -21,6 +21,8 @@ import { globalStyles } from "../components/styles/globalStyles";
 import { supabase } from "../utils/supabase";
 import uuid from "react-native-uuid";
 import { useEffect } from "react";
+import { KeyboardAvoidingView } from "react-native";
+import { SafeAreaView } from "react-native";
 
 export default function HomeScreen({ navigation }) {
   // Get the height and width of the mobile device
@@ -107,7 +109,12 @@ export default function HomeScreen({ navigation }) {
   }, [])
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior="padding"
+      enabled
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}>
+        <SafeAreaView style={styles.container}>
       <StatusBar />
       <View style={styles.homeTextContainer}>
         <Text style={[styles.homeText, {fontSize: height * 0.05}]}>
@@ -135,7 +142,8 @@ export default function HomeScreen({ navigation }) {
           </TouchableWithoutFeedback>
         </View>
       </View>
-    </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 

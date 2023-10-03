@@ -9,12 +9,14 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
 } from "react-native";
 import CustomHeader from "../components/CustomHeader";
 import { FlatList } from "react-native";
 import ResultCard from "../components/SelfHelpResultCard";
 import { globalStyles } from "../components/styles/globalStyles";
 import { supabase } from "../utils/supabase";
+import { SafeAreaView } from "react-native";
 
 const ResultScreen = ({ route }) => {
   // get the new chat id from the route params
@@ -79,7 +81,12 @@ const ResultScreen = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+    style={{ flex: 1 }}
+      behavior="padding"
+      enabled
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}>
+    <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       <CustomHeader title="Result" showIcon={false} />
 
@@ -112,7 +119,8 @@ const ResultScreen = ({ route }) => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
