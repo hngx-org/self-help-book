@@ -19,7 +19,9 @@ import {
 } from "@expo-google-fonts/sora";
 import { globalStyles } from "../components/styles/globalStyles";
 import { supabase } from "../utils/supabase";
+import compromise from 'compromise'
 import uuid from "react-native-uuid";
+import selfHelpKeywords from "../utils/selfhelpkeywords";
 import { useEffect } from "react";
 
 export default function HomeScreen({ navigation }) {
@@ -48,14 +50,14 @@ export default function HomeScreen({ navigation }) {
       .from("chats")
       .insert([{ id: id, chat: [newChat], user_id: user.id }])
       .select();
-      console.log(data);
+    console.log(data);
   };
 
   // Function to get details of sign in user
   const getSignedInUser = async () => {
     const req = await fetch(`${baseUrl}/api/auth/@me`);
     const user = await req.json();
-    setUser({name: user.data.name, id: user.data.id, email: user.data.email});
+    setUser({ name: user.data.name, id: user.data.id, email: user.data.email });
   };
 
   const sendPrompt = async () => {
@@ -65,31 +67,50 @@ export default function HomeScreen({ navigation }) {
     try {
       // Check if prompt is empty or not
       if (prompt) {
-        // console.log(user);
-        // Send prompt request to the chatgpt API using the backend API
-        const req = await fetch(`${baseUrl}/api/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            history: [],
-            user_input: prompt
-          })
-        });
-        const response = await req.json();
-        console.log(response);
-        // Create a response variable called selfHelp to hold both the question and the result
-        // This will be sent to the result screen
-        const selfHelp = {
-          question: prompt,
-          answer: response.message,
-        };
-        // Create a new chat and save to supabase;
-        await createNewChat(chatId, selfHelp);
-        // Navigate to the result screen and send the selfHelp variable
-        navigation.navigate("Results", { result: [selfHelp], chatId });
-        console.log("sent");
+        // Check if the prompt contains keywords related to self-help
+        const containsSelfHelpKeywords = selfHelpKeywords.some(keyword =>
+          prompt.toLowerCase().includes(keyword.toLowerCase())
+        );
+
+        if (containsSelfHelpKeywords) {
+          // Send prompt request to the chatgpt API using the backend API
+          const req = await fetch(`${baseUrl}/api/chat/completions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              history: [],
+              user_input: prompt
+            })
+          });
+          const response = await req.json();
+          console.log(response);
+          // Create a response variable called selfHelp to hold both the question and the result
+          // This will be sent to the result screen
+          const selfHelp = {
+            question: prompt,
+            answer: response.message,
+          };
+          // Create a new chat and save to supabase;
+          await createNewChat(chatId, selfHelp);
+          // Navigate to the result screen and send the selfHelp variable
+          navigation.navigate("Results", { result: [selfHelp], chatId });
+          console.log("sent");
+        } else {
+          // Display a response for non-self-help questions
+          const nonSelfHelpResponse = "I can't provide answers to questions that are not related to self-help.";
+          // Create a response variable called nonSelfHelp to hold the response
+          const nonSelfHelp = {
+            question: prompt,
+            answer: nonSelfHelpResponse,
+          };
+          // Create a new chat and save to supabase;
+          await createNewChat(chatId, nonSelfHelp);
+          // Navigate to the result screen and send the nonSelfHelp variable
+          navigation.navigate("Results", { result: [nonSelfHelp], chatId });
+          console.log("sent");
+        }
       } else {
         Alert.alert("Hello, the prompt is empty how can we be of help");
       }
@@ -110,7 +131,7 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       <StatusBar />
       <View style={styles.homeTextContainer}>
-        <Text style={[styles.homeText, {fontSize: height * 0.05}]}>
+        <Text style={[styles.homeText, { fontSize: height * 0.05 }]}>
           Share your thoughts, goals, or concerns, and let's start this journey
           together
         </Text>
