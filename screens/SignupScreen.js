@@ -17,21 +17,30 @@ export default function SignupScreen({ navigation }) {
   const handleSignUp = async () => {
     setIsLoading(true); // Set isLoading to true when signup starts
     try {
-      const response = await axios.post(
-        'https://spitfire-interractions.onrender.com/api/auth/register',
-        {
-          name,
-          email,
-          password,
-          confirm_password: confirmPassword,
-        }
-      );
+      // const response = await axios.post(
+      //   'https://spitfire-interractions.onrender.com/api/auth/register',
+      //   {
+      //     name,
+      //     email,
+      //     password,
+      //     confirm_password: confirmPassword,
+      //   }
+      // );
+      const req = await fetch('https://spitfire-interractions.onrender.com/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name, email, password, confirm_password: confirmPassword })
+      });
+      const response = await req.json();
+      console.log(response)
 
-      if (response.status === 201) {
+      if (response.message == 'User Created Succesfully') {
         // Registration successful
         console.log('Registration successful', response.data);
         // Save user to local storage
-        AsyncStorage.setItem('user', JSON.stringify(response.data.data));
+        AsyncStorage.setItem('user', JSON.stringify(response.data));
         // Save user to Supabase
         const { data, error } = await supabase
           .from("users")
