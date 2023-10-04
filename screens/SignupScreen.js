@@ -79,7 +79,7 @@ export default function SignupScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholderTextColor={'#bababa'}
-            placeholder={'Name (A single name'}
+            placeholder={'Name (A single name)'}
             value={name}
             onChangeText={(text) => setName(text)}
           />
