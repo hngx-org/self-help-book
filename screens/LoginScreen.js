@@ -1,6 +1,7 @@
 import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, Dimensions, KeyboardAvoidingView } from 'react-native';
+import { AntDesign } from '@expo/vector-icons'
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -11,11 +12,17 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [ isPasswordVisibility, setIsPasswordVisibility ] = useState(false);
+
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisibility(!isPasswordVisibility)
+  }
 
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      if(email && password) {
+      if (email && password) {
         const response = await axios.post(
           'https://spitfire-interractions.onrender.com/api/auth/login',
           {
@@ -58,42 +65,54 @@ export default function LoginScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <StatusBar />
-      <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>Login</Text>
-      <View style={[styles.container, isLoading && styles.fadeContainer]}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={'#bababa'}
-            placeholder={'Email'}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={'#bababa'}
-            placeholder={'Password'}
-            secureTextEntry={true}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-          />
-        </View>
-        <View style={styles.loginContainer}>
-          <Text style={styles.text1}>Don't have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={styles.text2}>Sign Up</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior="padding"
+      enabled
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}
+    >
+      <SafeAreaView style={styles.mainContainer}>
+        <StatusBar />
+        <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>Login</Text>
+        <View style={[styles.container, isLoading && styles.fadeContainer]}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={'#bababa'}
+              placeholder={'Email'}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
+            <View style={styles.passwordInputContainer}>
+              <TextInput
+                style={ {flex: 1}}
+                placeholderTextColor={'#bababa'}
+                placeholder={'Password'}
+                secureTextEntry={!isPasswordVisibility}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+              />
+              <TouchableOpacity onPress={togglePasswordVisibility}>
+                <AntDesign name={isPasswordVisibility ? 'eye' : 'eyeo'} size={24} color={'#C67C4E'} style={styles.passwordIcon}/>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.loginContainer}>
+            <Text style={styles.text1}>Don't have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+              <Text style={styles.text2}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Login</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -132,6 +151,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     fontWeight: "600",
     marginTop: 30,
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderColor: '#EAEAEA',
+    borderWidth: 2,
+    borderRadius: 14,
+    paddingHorizontal: 20,
+    marginTop: 30,
+    height: 56,
+    width: '100%'
+  },
+  passwordIcon: {
+    marginRight: 10,
   },
   loginContainer: {
     marginTop: 10,
