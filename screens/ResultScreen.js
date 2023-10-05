@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import CustomHeader from "../components/CustomHeader";
 import { FlatList } from "react-native";
@@ -35,7 +37,6 @@ const ResultScreen = ({ route }) => {
       .from("chats")
       .select("chat")
       .eq("id", chatId);
-    console.log(chats);
     const { error } = await supabase
       .from("chats")
       .update({ chat: [...chats[0].chat, newChat] })
@@ -80,7 +81,19 @@ const ResultScreen = ({ route }) => {
               user_input: prompt,
             }),
           });
+          console.log(req);
           const response = await req.json();
+          
+          if(response.content && response.content == "The server is experiencing a high volume of requests. Please try again later."){
+            Alert.alert("Sorry", "The server is experiencing a high volume of requests. Please try again later.");
+            return;
+          }
+          if(response.message && response.message.includes("Invalid request")){
+            Alert.alert("Sorry, invalid request");
+            return;
+          }
+
+          console.log(response);
           // Create a response variable called selfHelp to hold both the question and the result
           const selfHelp = {
             question: prompt,
@@ -113,51 +126,44 @@ const ResultScreen = ({ route }) => {
   }, []);
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior="padding"
-      enabled
-      keyboardVerticalOffset={Platform.OS === "ios" ? 5 : 0}
-    >
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="auto" />
-        <CustomHeader title="Result" showIcon={false} />
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="auto" />
+      <CustomHeader title="Result" showIcon={false} />
 
-        <View style={styles.resultContainer}>
-          {data.length > 0 ? (
-            <FlatList
-              data={data}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item) => data.indexOf(item).toString()}
-              renderItem={({ item }) => <ResultCard result={item} />}
-            />
-          ) : (
-            <Text>No results found</Text>
-          )}
-        </View>
+      <View style={styles.resultContainer}>
+        {data.length > 0 ? (
+          <FlatList
+            data={data}
+            showsVerticalScrollIndicator={false}
+            keyExtractor={(item) => data.indexOf(item).toString()}
+            renderItem={({ item }) => <ResultCard result={item} />}
+          />
+        ) : (
+          <Text>No results found</Text>
+        )}
+      </View>
 
-        <View style={[globalStyles.inputContainer, styles.inputContainer]}>
-          <View style={globalStyles.inputField}>
-            <TextInput
-              style={globalStyles.input}
-              placeholder="How can we assist you today?"
-              value={prompt}
-              onChangeText={(text) => setPrompt(text)}
-            />
-            <TouchableOpacity
-              onPress={sendPrompt}
-              style={globalStyles.iconContainer}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color="#2F2D2C" />
-              ) : (
-                <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
-              )}
-            </TouchableOpacity>
-          </View>
+      <View style={[globalStyles.inputContainer, styles.inputContainer]}>
+        <View style={globalStyles.inputField}>
+          <TextInput
+            style={globalStyles.input}
+            placeholder="How can we assist you today?"
+            value={prompt}
+            onChangeText={(text) => setPrompt(text)}
+          />
+          <TouchableOpacity
+            onPress={sendPrompt}
+            style={globalStyles.iconContainer}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#2F2D2C" />
+            ) : (
+              <Image source={{ uri: sendIcon }} style={globalStyles.icon} />
+            )}
+          </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </View>
+    </SafeAreaView>
   );
 };
 
