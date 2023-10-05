@@ -1,6 +1,7 @@
 import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
+import { AntDesign } from '@expo/vector-icons'
 import axios from 'axios';
 import { supabase } from '../utils/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,6 +14,12 @@ export default function SignupScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Add isLoading state
+  const [nameError, setNameError] = useState('')
+  const [ isPasswordVisibility, setIsPasswordVisibility ] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisibility(!isPasswordVisibility)
+  }
 
   const handleSignUp = async () => {
     setIsLoading(true); // Set isLoading to true when signup starts
@@ -49,6 +56,7 @@ export default function SignupScreen({ navigation }) {
         navigation.navigate('Subscription');
       } else {
         console.error('Registration failed');
+        setNameError('Name can only be a single word.');
         Alert.alert('Registration Failed', 'Please check your input and try again.');
       }
     } catch (error) {
@@ -71,58 +79,84 @@ export default function SignupScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <StatusBar />
-      <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>Sign Up</Text>
-      <View style={[styles.container, isLoading && styles.fadeContainer]}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={'#bababa'}
-            placeholder={'Name (A single name)'}
-            value={name}
-            onChangeText={(text) => setName(text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={'#bababa'}
-            placeholder={'Email'}
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={'#bababa'}
-            placeholder={'Password'}
-            secureTextEntry={true}
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholderTextColor={'#bababa'}
-            placeholder={'Confirm password'}
-            secureTextEntry={true}
-            value={confirmPassword}
-            onChangeText={(text) => setConfirmPassword(text)}
-          />
-        </View>
-        <View style={styles.loginContainer}>
-          <Text style={styles.text1}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.text2}>Login</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior="padding"
+      enabled
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}
+    >
+      <SafeAreaView style={styles.mainContainer}>
+        <StatusBar />
+        <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>Sign Up</Text>
+        <View style={[styles.container, isLoading && styles.fadeContainer]}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={'#bababa'}
+              placeholder={'Name (A single name)'}
+              value={name}
+              onChangeText={(text) => {
+                setName(text);
+                if (text.includes(' ')) {
+                  setNameError('You can only use a single name')
+                } else {
+                  setNameError(null)
+                }
+              }
+              }
+            />
+            {nameError ? (<Text style={styles.errorText}>{nameError}</Text>) : null}
+            <TextInput
+              style={styles.input}
+              placeholderTextColor={'#bababa'}
+              placeholder={'Email'}
+              value={email}
+              onChangeText={(text) => setEmail(text)}
+            />
+            <View style={styles.passwordInputContainer}>
+              <TextInput
+                style={ {flex: 1}}
+                placeholderTextColor={'#bababa'}
+                placeholder={'Password'}
+                secureTextEntry={!isPasswordVisibility}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+              />
+              <TouchableOpacity onPress={togglePasswordVisibility}>
+                <AntDesign name={isPasswordVisibility ? 'eye' : 'eyeo'} size={24} color={'#C67C4E'} style={styles.passwordIcon}/>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.passwordInputContainer}>
+              <TextInput
+                style={ {flex: 1}}
+                placeholderTextColor={'#bababa'}
+                placeholder={'Password'}
+                secureTextEntry={!isPasswordVisibility}
+                value={confirmPassword}
+                onChangeText={(text) => setPassword(text)}
+              />
+              <TouchableOpacity onPress={togglePasswordVisibility}>
+                <AntDesign name={isPasswordVisibility ? 'eye' : 'eyeo'} size={24} color={'#C67C4E'} style={styles.passwordIcon}/>
+              </TouchableOpacity>
+            </View>
+
+          </View>
+          <View style={styles.loginContainer}>
+            <Text style={styles.text1}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.text2}>Login</Text>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+            {isLoading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sign Up</Text>
+            )}
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          {isLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign Up</Text>
-          )}
-        </TouchableOpacity>
-
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -160,6 +194,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     fontWeight: "600",
     marginTop: 30,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 5,
+    alignSelf: "flex-start"
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderColor: '#EAEAEA',
+    borderWidth: 2,
+    borderRadius: 14,
+    paddingHorizontal: 20,
+    marginTop: 30,
+    height: 56,
+    width: '100%'
+  },
+  passwordIcon: {
+    marginRight: 10,
   },
   loginContainer: {
     marginTop: 10,
