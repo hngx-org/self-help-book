@@ -10,7 +10,7 @@ const ResultCard = ({result}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.question}>{result.question}</Text>
-      <Text style={styles.answer}>{result.answer}</Text>
+      <Text style={styles.answer}>{result.answer.trim()}</Text>
     </View>
   )
 }

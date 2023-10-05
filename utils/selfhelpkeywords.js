@@ -7,6 +7,8 @@ const selfHelpKeywords = [
     "counseling",
     "therapy",
     "motivation",
+    "motivate",
+    "motivational",
     "inspiration",
     "empowerment",
     "self-improvement",
