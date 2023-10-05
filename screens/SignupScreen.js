@@ -1,25 +1,39 @@
-import { useFonts, Sora_400Regular } from '@expo-google-fonts/sora';
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, StatusBar, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
-import { AntDesign } from '@expo/vector-icons'
-import axios from 'axios';
-import { supabase } from '../utils/supabase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFonts, Sora_400Regular } from "@expo-google-fonts/sora";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import axios from "axios";
+import { supabase } from "../utils/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignupScreen({ navigation }) {
   let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPasswordVisibility, setConfirmPasswordVisibility] =
+    useState(false);
   const [isLoading, setIsLoading] = useState(false); // Add isLoading state
-  const [nameError, setNameError] = useState('')
-  const [ isPasswordVisibility, setIsPasswordVisibility ] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [isPasswordVisibility, setIsPasswordVisibility] = useState(false);
 
   const togglePasswordVisibility = () => {
-    setIsPasswordVisibility(!isPasswordVisibility)
-  }
+    setIsPasswordVisibility(!isPasswordVisibility);
+  };
 
   const handleSignUp = async () => {
     setIsLoading(true); // Set isLoading to true when signup starts
@@ -33,38 +47,56 @@ export default function SignupScreen({ navigation }) {
       //     confirm_password: confirmPassword,
       //   }
       // );
-      const req = await fetch('https://spitfire-interractions.onrender.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name, email, password, confirm_password: confirmPassword })
-      });
+      const req = await fetch(
+        "https://spitfire-interractions.onrender.com/api/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            confirm_password: confirmPassword,
+          }),
+        }
+      );
       const response = await req.json();
-      console.log(response)
+      console.log(response);
 
-      if (response.message == 'User Created Succesfully') {
+      if (response.message == "User Created Succesfully") {
         // Registration successful
-        console.log('Registration successful', response.data);
+        console.log("Registration successful", response.data);
         // Save user to local storage
-        AsyncStorage.setItem('user', JSON.stringify(response.data));
+        AsyncStorage.setItem("user", JSON.stringify(response.data));
         // Save user to Supabase
         const { data, error } = await supabase
           .from("users")
           .insert([{ id: response.data.id, name, email, password }])
           .select();
-        navigation.navigate('Subscription');
+        navigation.navigate("Subscription");
       } else {
-        console.error('Registration failed');
-        setNameError('Name can only be a single word.');
-        Alert.alert('Registration Failed', 'Please check your input and try again.');
+        console.error("Registration failed");
+        setNameError("Name can only be a single word.");
+        Alert.alert(
+          "Registration Failed",
+          "Please check your input and try again."
+        );
       }
     } catch (error) {
-      console.error('Error during registration', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        Alert.alert('Registration Failed', error.response.data.message);
+      console.error("Error during registration", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        Alert.alert("Registration Failed", error.response.data.message);
       } else {
-        Alert.alert('Registration Error', 'An error occurred during registration.');
+        Alert.alert(
+          "Registration Error",
+          "An error occurred during registration."
+        );
       }
     } finally {
       setIsLoading(false);
@@ -79,71 +111,83 @@ export default function SignupScreen({ navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior="padding"
-      enabled
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 5 : 0}
-    >
-      <SafeAreaView style={styles.mainContainer}>
-        <StatusBar />
-        <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>Sign Up</Text>
+    <SafeAreaView style={styles.mainContainer}>
+      <StatusBar />
+      <Text style={[styles.mainText, isLoading && styles.fadeContainer]}>
+        Sign Up
+      </Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={[styles.container, isLoading && styles.fadeContainer]}>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholderTextColor={'#bababa'}
-              placeholder={'Name (A single name)'}
+              placeholderTextColor={"#bababa"}
+              placeholder={"Username"}
               value={name}
               onChangeText={(text) => {
                 setName(text);
-                if (text.includes(' ')) {
-                  setNameError('You can only use a single name')
+                if (text.includes(" ")) {
+                  setNameError("You can only use a single name");
                 } else {
-                  setNameError(null)
+                  setNameError(null);
                 }
-              }
-              }
+              }}
             />
-            {nameError ? (<Text style={styles.errorText}>{nameError}</Text>) : null}
+            {nameError ? (
+              <Text style={styles.errorText}>{nameError}</Text>
+            ) : null}
             <TextInput
               style={styles.input}
-              placeholderTextColor={'#bababa'}
-              placeholder={'Email'}
+              placeholderTextColor={"#bababa"}
+              placeholder={"Email"}
+              keyboardType="email-address"
               value={email}
               onChangeText={(text) => setEmail(text)}
             />
             <View style={styles.passwordInputContainer}>
               <TextInput
-                style={ {flex: 1}}
-                placeholderTextColor={'#bababa'}
-                placeholder={'Password'}
+                style={{ flex: 1 }}
+                placeholderTextColor={"#bababa"}
+                placeholder={"Password"}
                 secureTextEntry={!isPasswordVisibility}
                 value={password}
                 onChangeText={(text) => setPassword(text)}
               />
               <TouchableOpacity onPress={togglePasswordVisibility}>
-                <AntDesign name={isPasswordVisibility ? 'eye' : 'eyeo'} size={24} color={'#C67C4E'} style={styles.passwordIcon}/>
+                <AntDesign
+                  name={isPasswordVisibility ? "eye" : "eyeo"}
+                  size={20}
+                  color={"#C67C4E"}
+                  style={styles.passwordIcon}
+                />
               </TouchableOpacity>
             </View>
             <View style={styles.passwordInputContainer}>
               <TextInput
-                style={ {flex: 1}}
-                placeholderTextColor={'#bababa'}
-                placeholder={'Password'}
-                secureTextEntry={!isPasswordVisibility}
+                style={{ flex: 1 }}
+                placeholderTextColor={"#bababa"}
+                placeholder={"Confirm password"}
+                secureTextEntry={!confirmPasswordVisibility}
                 value={confirmPassword}
-                onChangeText={(text) => setPassword(text)}
+                onChangeText={(text) => setConfirmPassword(text)}
               />
-              <TouchableOpacity onPress={togglePasswordVisibility}>
-                <AntDesign name={isPasswordVisibility ? 'eye' : 'eyeo'} size={24} color={'#C67C4E'} style={styles.passwordIcon}/>
+              <TouchableOpacity
+                onPress={() =>
+                  setConfirmPasswordVisibility(!confirmPasswordVisibility)
+                }
+              >
+                <AntDesign
+                  name={confirmPasswordVisibility ? "eye" : "eyeo"}
+                  size={20}
+                  color={"#C67C4E"}
+                  style={styles.passwordIcon}
+                />
               </TouchableOpacity>
             </View>
-
           </View>
           <View style={styles.loginContainer}>
             <Text style={styles.text1}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
               <Text style={styles.text2}>Login</Text>
             </TouchableOpacity>
           </View>
@@ -155,8 +199,8 @@ export default function SignupScreen({ navigation }) {
             )}
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
   );
 }
 
@@ -167,16 +211,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
-    width: '90%',
+    width: "90%",
   },
   fadeContainer: {
     opacity: 0.6,
   },
   mainText: {
     color: "#C67C4E",
-    fontFamily: 'Sora_400Regular',
+    fontFamily: "Sora_400Regular",
     fontSize: 34,
-    fontWeight: '600'
+    fontWeight: "600",
   },
   inputContainer: {
     width: "100%",
@@ -184,7 +228,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   input: {
-    fontFamily: 'Sora_400Regular',
+    fontFamily: "Sora_400Regular",
     color: "#2F2D2C",
     width: "100%",
     height: 56,
@@ -196,39 +240,39 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   errorText: {
-    color: 'red',
+    color: "#b80f0a",
     marginTop: 5,
-    alignSelf: "flex-start"
+    alignSelf: "flex-start",
   },
   passwordInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderColor: '#EAEAEA',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderColor: "#EAEAEA",
     borderWidth: 2,
     borderRadius: 14,
     paddingHorizontal: 20,
     marginTop: 30,
     height: 56,
-    width: '100%'
+    width: "100%",
   },
   passwordIcon: {
     marginRight: 10,
   },
   loginContainer: {
     marginTop: 10,
-    flexDirection: "row"
+    flexDirection: "row",
   },
   text1: {
     fontSize: 13,
-    color: '#9B9B9B',
-    fontFamily: 'Sora_400Regular',
+    color: "#9B9B9B",
+    fontFamily: "Sora_400Regular",
   },
   text2: {
-    fontFamily: 'Sora_400Regular',
+    fontFamily: "Sora_400Regular",
     fontSize: 13,
     color: "#C67C4E",
-    fontWeight: '700'
+    fontWeight: "700",
   },
   button: {
     width: "100%",
@@ -237,12 +281,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#C67C4E",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 30
+    marginTop: 30,
   },
   buttonText: {
     fontSize: 16,
-    fontFamily: 'Sora_400Regular',
-    fontWeight: '600',
-    color: '#fff'
-  }
-})
+    fontFamily: "Sora_400Regular",
+    fontWeight: "600",
+    color: "#fff",
+  },
+});

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, } from "react";
 import {
   FlatList,
   SafeAreaView,
@@ -93,7 +93,7 @@ const HistoryScreen = ({ navigation }) => {
                 <Text
                   style={{
                     color: "#2f2d2c",
-                    fontSize: height * 0.019,
+                    fontSize: height * 0.017,
                     fontFamily: 'Sora_400Regular',
                   }}
                 >

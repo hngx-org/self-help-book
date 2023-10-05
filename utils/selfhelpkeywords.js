@@ -7,6 +7,8 @@ const selfHelpKeywords = [
     "counseling",
     "therapy",
     "motivation",
+    "motivate",
+    "motivational",
     "inspiration",
     "empowerment",
     "self-improvement",
@@ -47,7 +49,10 @@ const selfHelpKeywords = [
     "emotional intelligence",
     "life balance",
     "wellness practices",
-    "lifestyle"
+    "lifestyle",
+    "self-help tips",
+    "relationship",
+    "relationships",
     // Add more keywords as needed
 ];
 
