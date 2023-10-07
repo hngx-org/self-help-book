@@ -18,6 +18,7 @@ import uuid from "react-native-uuid";
 import selfHelpKeywords from "../utils/selfhelpkeywords";
 import { SafeAreaView } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen({ navigation }) {
   // Get the height and width of the mobile device
@@ -31,13 +32,12 @@ export default function HomeScreen({ navigation }) {
   // API base URL
   const baseUrl = "https://spitfire-interractions.onrender.com/";
 
+  // Bypassed AI Url to use for demo
+  const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
   // Send icon
   const sendIcon = "https://img.icons8.com/ios-glyphs/2F2D2C/30/sent.png";
-
-  // Check if font has loaded or not
-  // if (!fontsLoaded && !fontError) {
-  //   return null;
-  // }
 
   // Function to create a new chat
   const createNewChat = async (id, newChat) => {
@@ -48,11 +48,39 @@ export default function HomeScreen({ navigation }) {
     console.log(data);
   };
 
+  const customAi = async () => {
+    const request = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        max_tokens: 1024,
+        temperature: 0.9,
+      }),
+    });
+
+    const response = await request.json();
+
+    const selfHelp = {
+      question: prompt,
+      answer: response.choices[0].text,
+    };
+
+    return selfHelp;
+  };
+
   // Function to get details of sign in user
   const getSignedInUser = async () => {
+    const asyncUser = await AsyncStorage.getItem("user");
+    const subscribed = JSON.parse(asyncUser).subscribed;
+    console.log(subscribed);
     const req = await fetch(`${baseUrl}/api/auth/@me`);
     const user = await req.json();
-    setUser({ ...user.data });
+    setUser({ ...user.data, subscribed });
+    console.log(user.data);
     console.log("Focused");
   };
 
@@ -69,43 +97,125 @@ export default function HomeScreen({ navigation }) {
         );
 
         // Check if the user has any credits left
-        if (user.credits <= 0) {
+        if (user.credits <= 0 && user.subscribed === false) {
           Alert.alert(
             "Sorry",
-            "You have no credits left, please buy more credits to continue using the app"
+            "You have no credits left, please buy more credits to continue using the app",
+            [
+              {
+                text: "Buy Credits",
+                onPress: () => navigation.navigate("Subscription"),
+              },
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel",
+              },
+            ]
           );
           return;
         }
 
         if (containsSelfHelpKeywords) {
-          // Send prompt request to the chatgpt API using the backend API
-          const req = await fetch(`${baseUrl}/api/chat/`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_input: prompt,
-            }),
-          });
-          const response = await req.json();
-          
-          if(response.content && response.content == "The server is experiencing a high volume of requests. Please try again later."){
-            Alert.alert("Sorry", "The server is experiencing a high volume of requests. Please try again later.");
-            return;
+          // Define self help variable
+          let selfHelp;
+          // Check if the user is subscribed or not
+          if (user.subscribed === false) {
+            // Send prompt request to the chatgpt API using the backend API
+            const req = await fetch(`${baseUrl}/api/chat/`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                user_input: prompt,
+              }),
+            });
+            const response = await req.json();
+            console.log(response);
+
+            if (
+              response.content &&
+              response.content ==
+                "The server is experiencing a high volume of requests. Please try again later."
+            ) {
+              setLoading(true);
+              Alert.alert(
+                "Sorry",
+                "The server is experiencing a high volume of requests. Please try again later.",
+                [
+                  {
+                    text: "Contiue with alternative",
+                    onPress: async () => {
+                      selfHelp = await customAi();
+                      console.log(selfHelp);
+                      // Create a new chat and save to supabase;
+                      await createNewChat(chatId, selfHelp);
+                      // Navigate to the result screen and send the selfHelp variable
+                      navigation.navigate("Results", {
+                        result: [selfHelp],
+                        chatId,
+                      });
+                      console.log("sent");
+                    },
+                  },
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel",
+                  },
+                ]
+              );
+              setLoading(false);
+              return;
+            } else if (
+              response.message &&
+              response.message.includes("Invalid request")
+            ) {
+              Alert.alert("Sorry, invalid request");
+              return;
+            } else {
+              console.log(response.content);
+              // Create a response variable called selfHelp to hold both the question and the result
+              // This will be sent to the result screen
+              selfHelp = {
+                question: prompt,
+                answer: response.message && response.message,
+              };
+              // Create a new chat and save to supabase;
+              await createNewChat(chatId, selfHelp);
+              // Navigate to the result screen and send the selfHelp variable
+              navigation.navigate("Results", { result: [selfHelp], chatId });
+              console.log("sent");
+            }
+          } // If the user is subscribed, send prompt request to the OpenAI API
+          else if (user.subscribed === true) {
+            const request = await fetch(apiUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiKey}`,
+              },
+              body: JSON.stringify({
+                prompt: prompt,
+                max_tokens: 1024,
+                temperature: 0.9,
+              }),
+            });
+
+            const response = await request.json();
+
+            selfHelp = {
+              question: prompt,
+              answer: response.choices[0].text,
+            };
           }
-          console.log(response.content);
-          // Create a response variable called selfHelp to hold both the question and the result
-          // This will be sent to the result screen
-          const selfHelp = {
-            question: prompt,
-            answer: response.message && response.message,
-          };
+
           // Create a new chat and save to supabase;
-          await createNewChat(chatId, selfHelp);
-          // Navigate to the result screen and send the selfHelp variable
-          navigation.navigate("Results", { result: [selfHelp], chatId });
-          console.log("sent");
+          // await createNewChat(chatId, selfHelp);
+          // // Navigate to the result screen and send the selfHelp variable
+          // navigation.navigate("Results", { result: [selfHelp], chatId });
+          // console.log("sent");
         } else {
           // Display a response for non-self-help questions
           const nonSelfHelpResponse =

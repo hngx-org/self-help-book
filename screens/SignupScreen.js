@@ -1,4 +1,3 @@
-import { useFonts, Sora_400Regular } from "@expo-google-fonts/sora";
 import React, { useState } from "react";
 import {
   View,
@@ -19,7 +18,6 @@ import { supabase } from "../utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignupScreen({ navigation }) {
-  let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,15 +36,6 @@ export default function SignupScreen({ navigation }) {
   const handleSignUp = async () => {
     setIsLoading(true); // Set isLoading to true when signup starts
     try {
-      // const response = await axios.post(
-      //   'https://spitfire-interractions.onrender.com/api/auth/register',
-      //   {
-      //     name,
-      //     email,
-      //     password,
-      //     confirm_password: confirmPassword,
-      //   }
-      // );
       const req = await fetch(
         "https://spitfire-interractions.onrender.com/api/auth/register",
         {
@@ -69,12 +58,14 @@ export default function SignupScreen({ navigation }) {
         // Registration successful
         console.log("Registration successful", response.data);
         // Save user to local storage
-        AsyncStorage.setItem("user", JSON.stringify(response.data));
+        await AsyncStorage.setItem("user", JSON.stringify({...response.data, subscribed: false}));
         // Save user to Supabase
         const { data, error } = await supabase
           .from("users")
-          .insert([{ id: response.data.id, name, email, password }])
+          .insert([{ id: response.data.id, name, email, password, subscribed: false }])
           .select();
+        console.log(data);
+
         navigation.navigate("Subscription");
       } else {
         console.error("Registration failed");
@@ -105,10 +96,6 @@ export default function SignupScreen({ navigation }) {
       setPassword(null);
     }
   };
-  if (!fontsLoaded && !fontError) {
-    // console.log("Not loaded")
-    return null;
-  }
 
   return (
     <SafeAreaView style={styles.mainContainer}>
