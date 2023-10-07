@@ -3,7 +3,7 @@ Welcome to the Self-Help Book – your personal guide to personal growth, empowe
 
 ## OUTLINE
 - [How it works](#how-it-works)
-- [Making requests](#making-request)
+- [Making requests](#making-requests)
 - [Setup instructions](#setup-instructions)
 - [Additional notes](#additional-notes)
 
