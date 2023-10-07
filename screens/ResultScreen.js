@@ -17,8 +17,8 @@ import { globalStyles } from "../components/styles/globalStyles";
 import { supabase } from "../utils/supabase";
 import { SafeAreaView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import selfHelpKeywords from "../utils/selfhelpkeywords";
+// import 'dotenv/config';
 
 const ResultScreen = ({ route, navigation }) => {
   const chatId = route.params.chatId;
@@ -31,8 +31,8 @@ const ResultScreen = ({ route, navigation }) => {
   const baseUrl = "https://spitfire-interractions.onrender.com/";
 
   // Bypassed AI Url to use for demo
-  const apiKey = "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";
-  const apiUrl = `https://api.openai.com/v1/engines/text-davinci-002/completions`;
+  const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
   const addNewChat = async (newChat) => {
     const { data: chats } = await supabase

@@ -1,4 +1,3 @@
-import { useFonts, Sora_400Regular } from "@expo-google-fonts/sora";
 import React, { useState } from "react";
 import {
   View,
@@ -19,7 +18,6 @@ import { supabase } from "../utils/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignupScreen({ navigation }) {
-  let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -98,10 +96,6 @@ export default function SignupScreen({ navigation }) {
       setPassword(null);
     }
   };
-  if (!fontsLoaded && !fontError) {
-    // console.log("Not loaded")
-    return null;
-  }
 
   return (
     <SafeAreaView style={styles.mainContainer}>

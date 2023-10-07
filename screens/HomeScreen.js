@@ -33,8 +33,8 @@ export default function HomeScreen({ navigation }) {
   const baseUrl = "https://spitfire-interractions.onrender.com/";
 
   // Bypassed AI Url to use for demo
-  const apiKey = "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";
-  const apiUrl = `https://api.openai.com/v1/engines/text-davinci-002/completions`;
+  const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
 
   // Send icon
   const sendIcon = "https://img.icons8.com/ios-glyphs/2F2D2C/30/sent.png";
