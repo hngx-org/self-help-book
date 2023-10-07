@@ -1,5 +1,4 @@
-import { useFonts, Sora_400Regular } from "@expo-google-fonts/sora";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,18 +13,21 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../utils/supabase";
+
 
 export default function LoginScreen({ navigation }) {
   const { height } = Dimensions.get("window");
-  let [fontsLoaded, fontError] = useFonts({ Sora_400Regular });
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordVisibility, setIsPasswordVisibility] = useState(false);
+  const [subscription, setSubscription] = useState(false);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisibility(!isPasswordVisibility);
@@ -48,9 +50,13 @@ export default function LoginScreen({ navigation }) {
           // Login successful
           console.log("Login successful", response.data);
           // Save user for easy retrieval
-          AsyncStorage.setItem("user", JSON.stringify(response.data.data));
-
-          navigation.navigate("Subscription");
+          AsyncStorage.setItem("user", JSON.stringify({...response.data.data, subscribed: subscription}));
+          // Redirect users based on subscription status
+          if(subscription) {
+            navigation.navigate("Main");
+          } else {
+            navigation.navigate("Subscription");
+          }
         } else {
           console.error("Login failed");
           Alert.alert(
@@ -78,10 +84,25 @@ export default function LoginScreen({ navigation }) {
       setPassword(null);
     }
   };
+  // Get the user details
+  const getUser = async () => {
+    const asyncUser = await AsyncStorage.getItem("user");
+    const user = JSON.parse(asyncUser);
 
-  if (!fontsLoaded && !fontError) {
-    return null;
-  }
+    let { data: users, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", user.id);
+    if (users[0].subscribed) {
+      setSubscription(true);
+    }
+  };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      getUser();
+    }, []) // Empty dependency array to ensure it runs only on screen focus
+  );
 
   return (
     <SafeAreaView style={styles.mainContainer}>

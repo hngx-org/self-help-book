@@ -9,9 +9,6 @@ import {
   Image,
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
 import CustomHeader from "../components/CustomHeader";
 import { FlatList } from "react-native";
@@ -19,10 +16,11 @@ import ResultCard from "../components/SelfHelpResultCard";
 import { globalStyles } from "../components/styles/globalStyles";
 import { supabase } from "../utils/supabase";
 import { SafeAreaView } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import selfHelpKeywords from "../utils/selfhelpkeywords";
 
-const ResultScreen = ({ route }) => {
+const ResultScreen = ({ route, navigation }) => {
   const chatId = route.params.chatId;
   const [user, setUser] = useState(null);
   const [data, setData] = useState(route.params.result);
@@ -31,6 +29,10 @@ const ResultScreen = ({ route }) => {
 
   const sendIcon = "https://img.icons8.com/ios-glyphs/2F2D2C/30/sent.png";
   const baseUrl = "https://spitfire-interractions.onrender.com/";
+
+  // Bypassed AI Url to use for demo
+  const apiKey = "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";
+  const apiUrl = `https://api.openai.com/v1/engines/text-davinci-002/completions`;
 
   const addNewChat = async (newChat) => {
     const { data: chats } = await supabase
@@ -45,9 +47,42 @@ const ResultScreen = ({ route }) => {
 
   // Function to get details of sign in user
   const getSignedInUser = async () => {
+    // Get user subscription status from async storage
+    const asyncUser = await AsyncStorage.getItem("user");
+    const subscribed = JSON.parse(asyncUser).subscribed;
+
+    // Get user details from backend API
     const req = await fetch(`${baseUrl}/api/auth/@me`);
     const user = await req.json();
-    setUser({ ...user.data });
+    // Set user state
+    setUser({ ...user.data, subscribed });
+    console.log("Focused");
+  };
+
+  const customAi = async () => {
+    const request = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        max_tokens: 1024,
+        temperature: 0.9,
+      }),
+    });
+
+    const response = await request.json();
+
+    const selfHelp = {
+      question: prompt,
+      answer: response.choices[0].text,
+    };
+    console.log("Cusotom");
+    console.log(selfHelp);
+
+    return selfHelp;
   };
 
   const sendPrompt = async () => {
@@ -61,48 +96,122 @@ const ResultScreen = ({ route }) => {
           prompt.toLowerCase().includes(keyword.toLowerCase())
         );
         // Check if the user has any credits left
-        if (user.credits <= 0) {
+        if (user.credits <= 0 && user.subscribed === false) {
           Alert.alert(
             "Sorry",
-            "You have no credits left, please buy more credits to continue using the app"
+            "You have no credits left, please buy more credits to continue using the app",
+            [
+              {
+                text: "Buy Credits",
+                onPress: () => navigation.navigate("Subscription"),
+              },
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel",
+              },
+            ]
           );
           return;
         }
 
         if (containsSelfHelpKeywords) {
+          // Set the self help variable
+          let selfHelp;
           // Send prompt request to the chatgpt API using the backend API
-          const req = await fetch(`${baseUrl}/api/chat/completions`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              history: data,
-              user_input: prompt,
-            }),
-          });
-          console.log(req);
-          const response = await req.json();
-          
-          if(response.content && response.content == "The server is experiencing a high volume of requests. Please try again later."){
-            Alert.alert("Sorry", "The server is experiencing a high volume of requests. Please try again later.");
-            return;
-          }
-          if(response.message && response.message.includes("Invalid request")){
-            Alert.alert("Sorry, invalid request");
-            return;
+          if (user.subscribed === false) {
+            const req = await fetch(`${baseUrl}/api/chat/completions`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                history: data,
+                user_input: prompt,
+              }),
+            });
+            console.log(req);
+            const response = await req.json();
+
+            if (
+              response.content &&
+              response.content ==
+                "The server is experiencing a high volume of requests. Please try again later."
+            ) {
+              Alert.alert(
+                "Sorry",
+                "The server is experiencing a high volume of requests. Please try again later.",
+                [
+                  {
+                    text: "Contiue with alternative",
+                    onPress: async () => {
+                      selfHelp = await customAi();
+                      console.log(selfHelp);
+                      // Create a new chat and save to supabase;
+                      await addNewChat(selfHelp);
+                      const currentCredits = user.credits - 1;
+                      setUser({ ...user, credits: currentCredits });
+                      setData([...data, selfHelp]);
+                      console.log("sent");
+                    },
+                  },
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel",
+                  },
+                ]
+              );
+              return;
+            } else if (
+              response.message &&
+              response.message.includes("Invalid request")
+            ) {
+              Alert.alert("Sorry, invalid request");
+              return;
+            } else {
+              console.log(response);
+              // Create a response variable called selfHelp to hold both the question and the result
+              selfHelp = {
+                question: prompt,
+                answer: response.message,
+              };
+            }
+          } else if (user.subscribed === true) {
+            const request = await fetch(apiUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiKey}`,
+              },
+              body: JSON.stringify({
+                prompt: prompt,
+                max_tokens: 1024,
+                temperature: 0.9,
+              }),
+            });
+
+            const response = await request.json();
+
+            selfHelp = {
+              question: prompt,
+              answer: response.choices[0].text,
+            };
+
+            // Create a new chat and save to supabase;
+            await addNewChat(selfHelp);
+            const currentCredits = user.credits - 1;
+            setUser({ ...user, credits: currentCredits });
+            setData([...data, selfHelp]);
+            console.log("sent");
           }
 
-          console.log(response);
-          // Create a response variable called selfHelp to hold both the question and the result
-          const selfHelp = {
-            question: prompt,
-            answer: response.message,
-          };
           // Create a new chat and save to supabase;
-          await addNewChat(selfHelp);
-          setData([...data, selfHelp]);
-          console.log("sent");
+          // await addNewChat(selfHelp);
+          // const currentCredits = user.credits - 1;
+          // setUser({ ...user, credits: currentCredits });
+          // setData([...data, selfHelp]);
+          // console.log("sent");
         } else {
           // Display a response for non-self-help questions
           const nonSelfHelpResponse =
